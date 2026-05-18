@@ -1,0 +1,149 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DCP.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DesignWidth="500"
+        d:DesignHeight="360"
+        x:Class="DCP.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="600"
+        Height="360"
+        MinWidth="600"
+        MinHeight="360"
+        Title="DCP"
+        Background="#0F0F10">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#F3F3F3"/>
+        </Style>
+
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#18181B"/>
+            <Setter Property="Foreground" Value="#F5F5F5"/>
+            <Setter Property="BorderBrush" Value="#8B1E24"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="#F5F5F5"/>
+            <Setter Property="Background" Value="#151518"/>
+            <Setter Property="BorderBrush" Value="#8B1E24"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+
+        <Style Selector="TextBox /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="#151518"/>
+            <Setter Property="BorderBrush" Value="#8B1E24"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+
+        <Style Selector="ProgressBar">
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="100"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Padding="16"
+            Background="#121214"
+            BorderBrush="#6F161B"
+            BorderThickness="1"
+            CornerRadius="8">
+
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*"
+              RowSpacing="12">
+
+            <TextBlock Grid.Row="0"
+                       Text="Emplacement source"
+                       FontWeight="SemiBold"/>
+
+            <TextBox Grid.Row="1"
+                     Text="{Binding CleanupPath}"
+                     PlaceholderText="Selectionner l'emplacement des vidéos à trier..."
+                     VerticalContentAlignment="Center">
+                <TextBox.InnerRightContent>
+                    <Button Content="..."
+                            MinWidth="50"
+                            Margin="6,0,0,0"
+                            Command="{Binding BrowseCleanupFilesCommand}"/>
+                </TextBox.InnerRightContent>
+            </TextBox>
+
+            <TextBlock Grid.Row="2"
+                       Text="Emplacement destination"
+                       FontWeight="SemiBold"/>
+
+            <TextBox Grid.Row="3"
+                     Text="{Binding DestPath}"
+                     PlaceholderText="Selectionner l'emplacement de destination..."
+                     VerticalContentAlignment="Center">
+                <TextBox.InnerRightContent>
+                    <Button Content="..."
+                            MinWidth="50"
+                            Margin="6,0,0,0"
+                            Command="{Binding BrowseDestinationFilesCommand}"/>
+                </TextBox.InnerRightContent>
+            </TextBox>
+
+            <Button Grid.Row="4"
+                    Content="Trier les vidéos"
+                    Width="170"
+                    HorizontalAlignment="Center"
+                    Command="{Binding CopyFilesCommand}"
+                    IsEnabled="{Binding CanCopyFiles}"/>
+
+            <ScrollViewer Grid.Row="5"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ItemsRepeater x:Name="FilesRepeater"
+                               ItemsSource="{Binding FilesCopied}">
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,10"
+                                    Padding="10"
+                                    Background="#18181B"
+                                    BorderBrush="#8B1E24"
+                                    BorderThickness="1"
+                                    CornerRadius="6">
+                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                      ColumnSpacing="12">
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Name}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxWidth="180"/>
+
+                                    <ProgressBar Grid.Column="1"
+                                                 Value="{Binding Progress}"
+                                                 Minimum="0"
+                                                 Maximum="100"
+                                                 Height="18"
+                                                 Foreground="#8B1E24"
+                                                 VerticalAlignment="Center"/>
+
+                                    <Button Grid.Column="2"
+                                            Content="Vider"
+                                            MinWidth="60"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding #FilesRepeater.((vm:MainWindowViewModel)DataContext).RemoveVideoCommand}"
+                                            CommandParameter="{Binding}">
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </ScrollViewer>
+
+        </Grid>
+    </Border>
+</Window>
