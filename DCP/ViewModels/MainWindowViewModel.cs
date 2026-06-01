@@ -4,9 +4,11 @@ using CommunityToolkit.Mvvm.Input;
 using DCP.Models;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SqlTypes;
 using System.IO;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,9 +34,22 @@ namespace DCP.ViewModels
 
         [ObservableProperty]
         private bool _canEmptyItem = false;
+        [ObservableProperty]
+        private bool _canClearAll = true;
+
+        private UserData _userData;
+
 
         public MainWindowViewModel()
         {
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (File.Exists(Path.Combine(appDataPath, "user.json")))
+            {
+                string json = File.ReadAllText(Path.Combine(appDataPath, "user.json"));
+                _userData = JsonSerializer.Deserialize<UserData>(json);
+                CleanupPath = _userData.SourcePath;
+                DestPath = _userData.DestPath;
+            }
         }
         partial void OnCleanupPathChanged(string value)
         {
@@ -53,6 +68,12 @@ namespace DCP.ViewModels
         [RelayCommand(CanExecute = nameof(CanCopyFiles))]
         private async Task CopyFiles()
         {
+            _userData = new UserData { SourcePath = CleanupPath, DestPath = DestPath };
+            string json = JsonSerializer.Serialize(_userData);
+            string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            Directory.CreateDirectory(folder);
+            await Task.Run(() => File.WriteAllTextAsync(Path.Combine(folder, "user.json"), json));
+
             var paths = new ObservableCollection<string>(Directory.GetFiles(CleanupPath, "*.mp4"));
             foreach (var path in paths)
             {
@@ -109,7 +130,7 @@ namespace DCP.ViewModels
             Action<int> onProgress = null,
             CancellationToken cancellationtoken = default)
         {
-            const int bufferSize = 10*1024*1024; //10MB
+            const int bufferSize = 1*1024*1024; //10MB
             await using var source = new FileStream(
                 inPath,
                 FileMode.Open,
@@ -184,5 +205,30 @@ namespace DCP.ViewModels
             FilesCopied.Remove(item);
         }
 
+        [RelayCommand]
+        public void ClearAllVideos()
+        {
+            List<int> toRemove = new List<int>();
+            try
+            {
+                foreach (var item in FilesCopied)
+                {
+
+                    if (item.Progress == 100)
+                    {
+                        toRemove.Add(FilesCopied.IndexOf(item));
+                       //FilesCopied.Remove(item);
+                    }
+                }
+            }
+            finally
+            {
+                for(int i = toRemove.Count-1; i >= 0; i--)
+                {
+                    FilesCopied.RemoveAt(toRemove[i]);
+                }
+            }
+            
+        }
     }
 }

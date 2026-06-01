@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DCP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c18d33fe21ead913c457c2b6fe41e13acdb36f5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a9de5734324c7f7562056c27a4c17e0da38b8b9a")]
 [assembly: System.Reflection.AssemblyProductAttribute("DCP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DCP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

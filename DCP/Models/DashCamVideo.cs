@@ -42,10 +42,23 @@ namespace DCP.Models
         }
         [ObservableProperty]
         private int _progress;
+
+        [ObservableProperty]
+        private bool _canRemoveItem = false;
+
+        partial void OnProgressChanged(int value)
+        {
+            if(Progress == 100)
+            {
+                CanRemoveItem = true;
+            }
+        }
+
         public DashCamVideo(string path, bool front)
         {
             VideoPath = path??string.Empty;
-            Date = path.Substring(path.LastIndexOf("\\")+1,8)??string.Empty;
+            string dateTemp = path.Substring(path.LastIndexOf("\\") + 1, 8) ?? string.Empty;
+            Date = dateTemp.Substring(0, 4) + " " + dateTemp.Substring(4, 2) + " " + dateTemp.Substring(6, 2);
             IsFront = front;
             if (front)
             {
@@ -55,9 +68,8 @@ namespace DCP.Models
             { 
                 Name = "AR_"; 
             }
-            Name += path.Substring(path.LastIndexOf("\\") + 1, 8)??string.Empty;
-            Name += "_";
-            Name += path.Substring(path.LastIndexOf("\\") + 9, 6);
+            string nameTemp = path.Substring(path.LastIndexOf("\\") + 9, 6);
+            Name = nameTemp.Substring(0, 2) + "h" + nameTemp.Substring(2, 2) + "m" + nameTemp.Substring(4, 2) + "s";
             Extension = Path.GetExtension(path) ?? string.Empty;
         }
     }
